@@ -1,4 +1,4 @@
-# app.py
+#code
 import os
 import base64
 import tempfile
@@ -17,24 +17,17 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 
-# =======================
-# 1. API Keys
-# =======================
+
 GOOGLE_API_KEY = "AIzaSyAqJpwzrd9MWTD3kgnKwhRb3l_dxFweCH8"
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# =======================
-# 2. LLM + Embeddings
-# =======================
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"}   # ✅ force CPU
 )
-# =======================
-# 3. Vector Store
-# =======================
+
 vectorstore = None
 
 def add_to_vectorstore(text, source=""):
@@ -55,9 +48,7 @@ def retrieve_context(query):
     results = vectorstore.similarity_search(query, k=3)
     return "\n".join([r.page_content for r in results])
 
-# =======================
-# 4. Helpers
-# =======================
+
 def pil_to_base64(img):
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
     img.save(tmp.name, format="PNG")
@@ -103,9 +94,7 @@ def speak_text(text, lang="en", filename="output.mp3"):
     tts.save(filename)
     return filename
 
-# =======================
-# 5. Streamlit UI
-# =======================
+
 st.set_page_config(page_title="📚 Multi-Modal RAG + AV Assistant", layout="centered")
 
 st.title("📚 Multi-Modal RAG + 🎙️ Audio/Video Assistant")
@@ -129,9 +118,7 @@ LANG_CODE_MAP = {
     "Spanish": "es"
 }
 
-# =======================
-# 6. Process Files
-# =======================
+
 if uploaded_files:
     for uploaded_file in uploaded_files:
         path = os.path.join(tempfile.gettempdir(), uploaded_file.name)
@@ -173,9 +160,7 @@ if uploaded_files:
                 st.write(vision.content)
                 add_to_vectorstore(vision.content, source=uploaded_file.name)
 
-# =======================
-# 7. Ask Questions
-# =======================
+
 if query:
     context = retrieve_context(query)
     if context.strip():
@@ -190,3 +175,4 @@ if query:
             st.audio(mp3)
     else:
         st.warning("❌ I don’t know (no relevant context found).")
+
